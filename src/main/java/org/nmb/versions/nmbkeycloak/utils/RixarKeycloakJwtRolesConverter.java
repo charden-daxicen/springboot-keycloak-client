@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
-public class KeycloakJwtRolesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+public class RixarKeycloakJwtRolesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     private static final String CLAIM_REALM_ACCESS = "realm_access";
     private static final String CLAIM_RESOURCE_ACCESS = "resource_access";
@@ -20,12 +20,15 @@ public class KeycloakJwtRolesConverter implements Converter<Jwt, Collection<Gran
 
     private final String kcClientId;
 
-    public KeycloakJwtRolesConverter(String kcClientId) {
+    public RixarKeycloakJwtRolesConverter(String kcClientId) {
         this.kcClientId = kcClientId;
     }
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
+
+        log.info("converting roles... {}",jwt.getClaims());
+
         Map<String, Collection<String>> realmAccess = jwt.getClaim(CLAIM_REALM_ACCESS);
         Map<String, Map<String, Collection<String>>> resourceAccess = jwt.getClaim(CLAIM_RESOURCE_ACCESS);
 
@@ -49,5 +52,6 @@ public class KeycloakJwtRolesConverter implements Converter<Jwt, Collection<Gran
 
         return grantedAuthorities;
     }
+
 }
 

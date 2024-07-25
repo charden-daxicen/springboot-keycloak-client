@@ -1,10 +1,11 @@
 package org.nmb.versions.nmbkeycloak.configs.auth;
 
 import lombok.extern.slf4j.Slf4j;
-import org.nmb.versions.nmbkeycloak.utils.KeycloakJwtRolesConverter;
+import org.nmb.versions.nmbkeycloak.utils.RixarKeycloakJwtRolesConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,10 +20,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class WebSecurityConfiguration {
 
     @Value("${keycloak.client-id}")
-    private String kcClientId;
+    private String keycloakClientId;
 
     @Value("${keycloak.issuer-url}")
     private String tokenIssuerUrl;
@@ -32,23 +34,21 @@ public class WebSecurityConfiguration {
 
         DelegatingJwtGrantedAuthoritiesConverter authoritiesConverter = new DelegatingJwtGrantedAuthoritiesConverter(
                 new JwtGrantedAuthoritiesConverter(),
-                new KeycloakJwtRolesConverter(kcClientId));
+                new RixarKeycloakJwtRolesConverter(keycloakClientId));
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/home/admin/**")
-                                .hasRole("ADMIN_WRITE")
-                                .requestMatchers("/home/public/**")
-                                .hasRole("USER_READ")
-                                .requestMatchers("/auth/**").permitAll()
-                                .anyRequest().authenticated())
+                                .requestMatchers("/auth/**")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated())
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedPage("/home/error/access-denied"))
+                        .accessDeniedPage("/api/error"))
+
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(oauth2ResourceServer ->
-                        oauth2ResourceServer
-                                .jwt(jwtCustomizer -> jwtCustomizer.jwtAuthenticationConverter(jwt -> new JwtAuthenticationToken(jwt, authoritiesConverter.convert(jwt))))
-                );
+                .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
+                        .jwt(jwtCustomizer -> jwtCustomizer.jwtAuthenticationConverter(jwt -> new JwtAuthenticationToken(jwt, authoritiesConverter.convert(jwt)))));
 
         return http.build();
     }
