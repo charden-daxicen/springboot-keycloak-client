@@ -42,23 +42,18 @@ public class AuthService {
     public ResponseEntity<Object> login(LoginRequestDto request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         log.info("Start to get access token");
 
-        String deviceId = servletRequest.getHeader(DEVICE_ID);
-
         TokenDto tokenDto = this.getAccessToken(request);
-
         servletResponse.addHeader(ACCESS_TOKEN, tokenDto.getAccessToken());
         servletResponse.addHeader(EXPIRES_IN, String.valueOf(tokenDto.getExpiresIn()));
 
         return ResponseEntity.ok().body(BaseResponseDto.builder()
                 .status("SUCCESS")
+                .data(tokenDto)
                 .build());
     }
 
     public ResponseEntity<Object> refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         log.info("Start to refresh access token");
-
-        String deviceId = servletRequest.getHeader(DEVICE_ID);
-//        String refreshToken = (String) sessionStorage.getCache(REFRESH_TOKEN, deviceId);
         String refreshToken = "";
 
         TokenDto tokenDto = this.getRefreshToken(refreshToken);
@@ -81,11 +76,10 @@ public class AuthService {
         requestBody.add("username", request.getUsername());
         requestBody.add("password", request.getPassword());
 
-        ResponseEntity<TokenDto> response = restTemplate.postForEntity(kcGetTokenUrl,
-                new HttpEntity<>(requestBody, headers), TokenDto.class);
-
+        ResponseEntity<TokenDto> response = restTemplate.postForEntity(kcGetTokenUrl, new HttpEntity<>(requestBody, headers), TokenDto.class);
         return response.getBody();
     }
+
 
     private TokenDto getRefreshToken(String refreshToken) {
         HttpHeaders headers = new HttpHeaders();

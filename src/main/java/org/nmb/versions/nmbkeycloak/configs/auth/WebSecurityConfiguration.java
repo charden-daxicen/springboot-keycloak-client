@@ -43,7 +43,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers("/auth/**").permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedPage("/error/access-denied"))
+                        .accessDeniedPage("/home/error/access-denied"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2ResourceServer ->
                         oauth2ResourceServer
