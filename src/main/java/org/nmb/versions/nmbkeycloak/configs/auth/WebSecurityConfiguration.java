@@ -1,6 +1,7 @@
 package org.nmb.versions.nmbkeycloak.configs.auth;
 
 import lombok.extern.slf4j.Slf4j;
+import org.nmb.versions.nmbkeycloak.controllers.advice.GoodAccessDeniedHandler;
 import org.nmb.versions.nmbkeycloak.utils.RixarKeycloakJwtRolesConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +30,11 @@ public class WebSecurityConfiguration {
     @Value("${keycloak.issuer-url}")
     private String tokenIssuerUrl;
 
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDenied accessDenied) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                                                   GoodAccessDeniedHandler goodAccessDeniedHandler) throws Exception {
 
         DelegatingJwtGrantedAuthoritiesConverter authoritiesConverter = new DelegatingJwtGrantedAuthoritiesConverter(
                 new JwtGrantedAuthoritiesConverter(),
@@ -38,17 +42,21 @@ public class WebSecurityConfiguration {
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/**")
+                                .requestMatchers("/auth/**","/access-denied")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
 
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedPage("/api/error"))
+                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedPage("/api/error"))
 
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
-                        .jwt(jwtCustomizer -> jwtCustomizer.jwtAuthenticationConverter(jwt -> new JwtAuthenticationToken(jwt, authoritiesConverter.convert(jwt)))));
+                .oauth2ResourceServer(oauth2ResourceServer ->
+                        oauth2ResourceServer
+                                .jwt(jwtCustomizer -> jwtCustomizer.jwtAuthenticationConverter(jwt -> new JwtAuthenticationToken(jwt, authoritiesConverter.convert(jwt))))
+                                .accessDeniedHandler(goodAccessDeniedHandler)
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                );
 
         return http.build();
     }
