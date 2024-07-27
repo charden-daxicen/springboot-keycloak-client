@@ -11,10 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDto {
+public class RefreshRequestDto {
 
-    private String username;
-
-    private String password;
+    private String refreshToken;
 
 }

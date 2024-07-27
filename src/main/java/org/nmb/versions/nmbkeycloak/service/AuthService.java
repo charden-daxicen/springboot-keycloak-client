@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.nmb.versions.nmbkeycloak.dto.BaseResponseDto;
 import org.nmb.versions.nmbkeycloak.dto.LoginRequestDto;
+import org.nmb.versions.nmbkeycloak.dto.RefreshRequestDto;
 import org.nmb.versions.nmbkeycloak.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class AuthService {
     private String kcClientSecret;
 
     @Value("${keycloak.get-token-url}")
-    private String kcGetTokenUrl;
+    private String keyCloakGetTokenUrl;
 
     private static final String GRANT_TYPE_PASSWORD = "password";
     private static final String ACCESS_TOKEN = "Access-Token";
@@ -52,20 +53,22 @@ public class AuthService {
                 .build());
     }
 
-    public ResponseEntity<Object> refreshToken(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public ResponseEntity<Object> refreshToken(RefreshRequestDto refreshRequestDto,HttpServletRequest servletRequest) {
         log.info("Start to refresh access token");
-        String refreshToken = "";
 
-        TokenDto tokenDto = this.getRefreshToken(refreshToken);
-        servletResponse.addHeader(ACCESS_TOKEN, tokenDto.getAccessToken());
-        servletResponse.addHeader(EXPIRES_IN, String.valueOf(tokenDto.getExpiresIn()));
+        TokenDto tokenDto = this.getRefreshToken(refreshRequestDto.getRefreshToken());
 
         return ResponseEntity.ok().body(BaseResponseDto.builder()
                 .status("SUCCESS")
+                .data(tokenDto)
                 .build());
     }
 
+
+
+
     private TokenDto getAccessToken(LoginRequestDto request) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -76,12 +79,16 @@ public class AuthService {
         requestBody.add("username", request.getUsername());
         requestBody.add("password", request.getPassword());
 
-        ResponseEntity<TokenDto> response = restTemplate.postForEntity(kcGetTokenUrl, new HttpEntity<>(requestBody, headers), TokenDto.class);
+        ResponseEntity<TokenDto> response = restTemplate.postForEntity(keyCloakGetTokenUrl,
+                new HttpEntity<>(requestBody, headers),
+                TokenDto.class);
+
         return response.getBody();
     }
 
 
     private TokenDto getRefreshToken(String refreshToken) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -91,8 +98,10 @@ public class AuthService {
         requestBody.add("client_id", kcClientId);
         requestBody.add("client_secret", kcClientSecret);
 
-        ResponseEntity<TokenDto> response = restTemplate.postForEntity(kcGetTokenUrl,
-                new HttpEntity<>(requestBody, headers), TokenDto.class);
+        ResponseEntity<TokenDto> response = restTemplate.postForEntity(
+                keyCloakGetTokenUrl,
+                new HttpEntity<>(requestBody, headers),
+                TokenDto.class);
 
         return response.getBody();
     }

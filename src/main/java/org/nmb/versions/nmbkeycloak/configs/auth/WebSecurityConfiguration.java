@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.List;
+
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -31,7 +33,7 @@ public class WebSecurityConfiguration {
     private String tokenIssuerUrl;
 
     @Value("${auth.endpoints.open}")
-    private String openEndpoints;
+    private List<String> openEndpoints;
 
 
     @Bean
@@ -45,11 +47,11 @@ public class WebSecurityConfiguration {
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/**",
-                                        "/access-denied")
+                                .requestMatchers("/auth/login","/auth/refresh-token","/access-denied")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
+
 
                 .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(customAuthenticationEntryPoint)
                 .accessDeniedPage("/api/error"))
