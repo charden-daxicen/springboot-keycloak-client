@@ -1,4 +1,4 @@
-package org.nmb.versions.nmbkeycloak.configs;
+package org.nmb.versions.nmbkeycloak.configs.rest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
