@@ -26,8 +26,8 @@ public class RegistrationService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${keycloak.get-token-url}")
-    private String keyCloakGetTokenUrl;
+    @Value("${keycloak.user.registration-url}")
+    private String keycloakUserRegistrationUrl;
 
     private final TokenRetriever tokenRetriever;
 
@@ -67,7 +67,7 @@ public class RegistrationService {
         HttpEntity<KeycloakRegistrationDto.Request> requestEntity = new HttpEntity<>(keycloakRegistrationReq, headers);
 
         ResponseEntity<GoodAuthToken> response = restTemplate.postForEntity(
-                keyCloakGetTokenUrl,
+                keycloakUserRegistrationUrl,
                 requestEntity,
                 GoodAuthToken.class);
 

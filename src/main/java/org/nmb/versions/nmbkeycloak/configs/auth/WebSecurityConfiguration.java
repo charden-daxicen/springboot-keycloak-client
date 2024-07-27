@@ -26,7 +26,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class WebSecurityConfiguration {
 
-    @Value("${keycloak.client-id}")
+    @Value("${keycloak.auth.client-id}")
     private String keycloakClientId;
 
     @Value("${keycloak.issuer-url}")

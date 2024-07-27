@@ -22,24 +22,22 @@ public class TokenRetriever {
 
     private static final String GRANT_TYPE_PASSWORD = "password";
 
-    @Value("${keycloak.client-id}")
+    @Value("${keycloak.auth.client-id}")
     private String kcClientId;
 
-    @Value("${keycloak.client-secret}")
+    @Value("${keycloak.auth.client-secret}")
     private String kcClientSecret;
 
-    @Value("${keycloak.client-username}")
+    @Value("${keycloak.auth.client-username}")
     private String keycloakClientUsername;
 
-    @Value("${keycloak.client-password}")
+    @Value("${keycloak.auth.client-password}")
     private String keycloakClientPassword;
 
-
-    @Value("${keycloak.get-token-url}")
+    @Value("${keycloak.auth.token-url}")
     private String keyCloakGetTokenUrl;
 
     private final RestTemplate restTemplate;
-
 
     public GoodAuthToken getAccessToken(LoginDto request) {
 
@@ -74,9 +72,9 @@ public class TokenRetriever {
                 new HttpEntity<>(requestBody, headers),
                 GoodAuthToken.class);
 
+        log.info("access token fetched successful");
         return response.getBody();
     }
-
 
     public GoodAuthToken getTokenByRefresh(String refreshToken) {
 
