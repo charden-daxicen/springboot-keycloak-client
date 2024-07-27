@@ -1,6 +1,5 @@
 package org.nmb.versions.nmbkeycloak.controllers;
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
