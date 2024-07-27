@@ -3,7 +3,7 @@ package org.nmb.versions.nmbkeycloak.configs.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.nmb.versions.nmbkeycloak.dto.BaseResponseDto;
+import org.nmb.versions.nmbkeycloak.dto.common.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,7 +20,7 @@ public class CustomAccessDenied implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        BaseResponseDto errorResponse = BaseResponseDto.builder()
+        ApiResponse errorResponse = ApiResponse.builder()
                 .status("ACCESS_DENIED")
                 .build();
 

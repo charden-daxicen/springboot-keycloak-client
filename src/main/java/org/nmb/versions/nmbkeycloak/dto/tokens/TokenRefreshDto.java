@@ -1,4 +1,4 @@
-package org.nmb.versions.nmbkeycloak.dto;
+package org.nmb.versions.nmbkeycloak.dto.tokens;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -47,7 +47,10 @@ public class WebSecurityConfiguration {
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/login","/auth/refresh-token","/access-denied")
+                                .requestMatchers("/auth/login",
+                                        "/auth/register",
+                                        "/auth/refresh-token",
+                                        "/access-denied")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())

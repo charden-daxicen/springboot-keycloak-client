@@ -3,6 +3,7 @@ package org.nmb.versions.nmbkeycloak.controllers.auth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.nmb.versions.nmbkeycloak.dto.LoginDto;
+import org.nmb.versions.nmbkeycloak.dto.RegistrationDto;
 import org.nmb.versions.nmbkeycloak.service.RegistrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +20,8 @@ public class RegistrationController {
     private final RegistrationService registrationService;
 
     @PostMapping(value = "/register")
-    public ResponseEntity<Object> register(@RequestBody LoginDto loginDto) {
-        return registrationService.register(loginDto);
+    public ResponseEntity<Object> register(@RequestBody RegistrationDto registrationDto) {
+        return registrationService.register(registrationDto);
     }
 
 }

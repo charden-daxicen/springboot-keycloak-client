@@ -21,6 +21,8 @@ public class KeycloakRegistrationDto {
 
         String firstName;
         String lastName;
+
+        Credentials credentials;
     }
 
     @Data
