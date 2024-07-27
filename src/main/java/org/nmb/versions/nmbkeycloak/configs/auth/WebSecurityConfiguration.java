@@ -30,6 +30,9 @@ public class WebSecurityConfiguration {
     @Value("${keycloak.issuer-url}")
     private String tokenIssuerUrl;
 
+    @Value("${auth.endpoints.open}")
+    private String openEndpoints;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -42,7 +45,8 @@ public class WebSecurityConfiguration {
 
         http.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/**","/access-denied")
+                                .requestMatchers("/auth/**",
+                                        "/access-denied")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
