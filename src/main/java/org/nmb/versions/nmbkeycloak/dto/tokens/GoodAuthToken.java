@@ -1,4 +1,4 @@
-package org.nmb.versions.nmbkeycloak.dto;
+package org.nmb.versions.nmbkeycloak.dto.tokens;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class TokenDto {
+public class GoodAuthToken {
 
     @JsonProperty("access_token")
     private String accessToken;
