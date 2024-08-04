@@ -1,5 +1,6 @@
 package org.nmb.versions.nmbkeycloak.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nmb.versions.nmbkeycloak.components.TokenRetriever;
@@ -11,7 +12,6 @@ import org.nmb.versions.nmbkeycloak.dto.keycloak.KeycloakRegistrationDto;
 import org.nmb.versions.nmbkeycloak.dto.tokens.GoodAuthToken;
 import org.nmb.versions.nmbkeycloak.dto.users.GoodUser;
 import org.nmb.versions.nmbkeycloak.utils.JHelper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -26,8 +26,6 @@ import java.util.List;
 @Service
 public class RegistrationService {
 
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Value("${keycloak.user.registration-url}")
     private String keycloakUserRegistrationUrl;
@@ -36,6 +34,8 @@ public class RegistrationService {
     private String userLookupUrl;
 
     private final TokenRetriever tokenRetriever;
+
+    private final RestTemplate restTemplate;
 
     public ApiResponse<GoodAuthToken> register(RegistrationDto registrationDto) {
 
@@ -46,9 +46,7 @@ public class RegistrationService {
             return ApiResponse.failure("User exists. " + message);
 
         } else if (goodUserApiResponse.getRespCode() != RespCodes.USER_DOES_NOT_EXIST) {
-            String message = this.mapMessage(goodUserApiResponse.getRespBody());
             return ApiResponse.failure("Failed to verify user information");
-
         }
 
         KeycloakRegistrationDto.Credentials passwordCredentials = KeycloakRegistrationDto.Credentials.builder()
@@ -112,10 +110,8 @@ public class RegistrationService {
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            ApiResponse<GoodUser> apiResponse = JHelper.fromJson(responseEntity.getBody(), ApiResponse.class);
-            return apiResponse;
+            return JHelper.fromJson(responseEntity.getBody(), new TypeReference<>() {});
         }
-
         return ApiResponse.failure("User not found");
     }
 
