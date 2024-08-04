@@ -18,4 +18,9 @@ public class RegistrationDto {
     private String lastName;
 
     private String password;
+
+    private String phoneNumber;
+    private String countryAlpha3Code;
+    private String countryCallingCode;
+
 }

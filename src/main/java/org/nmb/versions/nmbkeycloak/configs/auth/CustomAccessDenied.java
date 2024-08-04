@@ -20,12 +20,9 @@ public class CustomAccessDenied implements AccessDeniedHandler {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        ApiResponse errorResponse = ApiResponse.builder()
-                .status("ACCESS_DENIED")
-                .build();
-
+        ApiResponse<Object> apiResponse = ApiResponse.failure("Access denied", 4001);
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getWriter(), errorResponse);
+        mapper.writeValue(response.getWriter(), apiResponse);
     }
 
 

@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class KeycloakRegistrationDto {
 
     public enum CredentialType {
@@ -22,7 +25,8 @@ public class KeycloakRegistrationDto {
         String firstName;
         String lastName;
 
-        Credentials credentials;
+        List<Credentials> credentials;
+        HashMap<String,List<String>> attributes;
     }
 
     @Data
@@ -41,6 +45,7 @@ public class KeycloakRegistrationDto {
     public static class Response{
         String username;
     }
+
 
 
 
