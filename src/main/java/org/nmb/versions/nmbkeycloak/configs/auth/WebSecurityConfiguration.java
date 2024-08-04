@@ -50,6 +50,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers("/auth/login",
                                         "/auth/register",
                                         "/auth/refresh-token",
+                                        "/api/v1/auth/otp/request",
                                         "/access-denied")
                                 .permitAll()
                                 .anyRequest()

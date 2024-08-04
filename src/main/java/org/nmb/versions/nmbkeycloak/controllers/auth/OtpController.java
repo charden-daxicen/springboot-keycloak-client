@@ -16,19 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/api/v1/auth")
 public class OtpController {
 
     private final OtpService otpService;
 
-    @PostMapping(value = "/request")
+    @PostMapping(value = "/account/lookup")
+    public ResponseEntity<Object> lookupAccount(@RequestBody OtpDto.Inquiry otpRequest) {
+        log.info("lookup account... ");
+        ApiResponse<Object> apiResponse = otpService.requestOtp(otpRequest);
+        return ResponseEntity.ok().body(apiResponse);
+    }
+
+    @PostMapping(value = "/otp/request")
     public ResponseEntity<Object> requestOtp(@RequestBody OtpDto.Inquiry otpRequest) {
         log.info("request otp... ");
         ApiResponse<Object> apiResponse = otpService.requestOtp(otpRequest);
         return ResponseEntity.ok().body(apiResponse);
     }
 
-    @PostMapping(value = "/verify")
+    @PostMapping(value = "/otp/verify")
     public ResponseEntity<Object> verifyOtp(@RequestBody OtpDto.Verification verificationDto) {
         log.info("verifying otp... ");
         ApiResponse<GoodAuthToken> apiResponse = otpService.verifyOtp(verificationDto);

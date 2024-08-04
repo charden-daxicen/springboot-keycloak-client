@@ -133,16 +133,18 @@ public class KeycloakAdapter {
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         String requestBodyJson = JHelper.toJson(requestBody);
-        log.info("{} request {}", narration, requestBodyJson);
+        log.info("kc -- {} request -- {} -- {} ", narration,url, requestBodyJson);
         HttpEntity<String> httpEntity = new HttpEntity<>(requestBodyJson, headers);
 
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, httpEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            log.info("{} response {}", narration, responseEntity.getBody());
+            log.info("ky -- {} response -- {}", narration, responseEntity.getBody());
+            return ApiResponse.success("OTP sent to the customer");
         }
 
         log.error("{} request failed failed with status: {}", narration, responseEntity.getStatusCode());
-        return ApiResponse.failure("Request failed");
+        return ApiResponse.failure("Sorry, request failed. Try again later.");
     }
+
 
 }
