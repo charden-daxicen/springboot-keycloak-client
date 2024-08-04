@@ -99,7 +99,7 @@ public class RegistrationService {
 
     private ApiResponse<GoodUser> checkUserOnKeycloak(RegistrationDto registrationDto) {
 
-        GoodAuthToken accessToken = authTokenRetriever.getAdminAccessToken();
+        GoodAuthToken accessToken = keycloakAdapter.getAdminAccessToken();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -116,7 +116,7 @@ public class RegistrationService {
             return JHelper.fromJson(responseEntity.getBody(), UserLookupResponse.class);
         }
 
-        return UserLookupResponse.failure("User not found");
+        return ApiResponse.failure("User not found");
     }
 
     private String formatRegistrationErrorMessage(GoodUser goodUser) {
