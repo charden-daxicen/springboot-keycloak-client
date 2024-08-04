@@ -2,6 +2,7 @@ package org.nmb.versions.nmbkeycloak.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.nmb.versions.nmbkeycloak.components.TokenRetriever;
 import org.nmb.versions.nmbkeycloak.constants.IdentifierType;
@@ -11,6 +12,7 @@ import org.nmb.versions.nmbkeycloak.dto.common.ApiResponse;
 import org.nmb.versions.nmbkeycloak.dto.keycloak.KeycloakRegistrationDto;
 import org.nmb.versions.nmbkeycloak.dto.tokens.GoodAuthToken;
 import org.nmb.versions.nmbkeycloak.dto.users.GoodUser;
+import org.nmb.versions.nmbkeycloak.dto.users.UserLookupResponse;
 import org.nmb.versions.nmbkeycloak.utils.JHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+@Log4j2
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -43,7 +46,7 @@ public class RegistrationService {
         ApiResponse<GoodUser> goodUserApiResponse = this.checkUserOnKeycloak(registrationDto);
         if (goodUserApiResponse.getRespCode() == RespCodes.OK) {
             String message = this.mapMessage(goodUserApiResponse.getRespBody());
-            return ApiResponse.failure("User exists. " + message);
+            return ApiResponse.failure(message);
 
         } else if (goodUserApiResponse.getRespCode() != RespCodes.USER_DOES_NOT_EXIST) {
             return ApiResponse.failure("Failed to verify user information");
@@ -110,20 +113,22 @@ public class RegistrationService {
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            return JHelper.fromJson(responseEntity.getBody(), new TypeReference<>() {});
+            log.info("api response {}",responseEntity.getBody());
+            return JHelper.fromJson(responseEntity.getBody(), UserLookupResponse.class);
         }
-        return ApiResponse.failure("User not found");
+
+        return UserLookupResponse.failure("User not found");
     }
 
     private String mapMessage(GoodUser goodUser) {
         if (goodUser.getMatchedIdentifier() == IdentifierType.PHONE) {
-            return String.format("Phone: %s exists", goodUser.getPhoneNumber());
+            return String.format("Phone number %s already exists. Try logging in or resetting the password", goodUser.getPhoneNumber());
         }
 
         if (goodUser.getMatchedIdentifier() == IdentifierType.EMAIL) {
-            return String.format("Email: %s exists", goodUser.getEmail());
+            return String.format("Email %s is already registered. Try logging in or resetting the password", goodUser.getEmail());
         }
-        return "Identifier exists";
+        return "Information is already registered";
     }
 
 
