@@ -1,18 +1,18 @@
-package org.nmb.versions.nmbkeycloak.dto;
+package org.nmb.versions.nmbkeycloak.dto.otp;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginDto {
+public class OtpDto {
 
-    private String username;
+    @Data
+    public static class Inquiry {
+        private String identifier;
+    }
 
-    private String password;
+    @Data
+    public static class Verification {
+        private String identifier;
+        private String otp;
+    }
 
 }

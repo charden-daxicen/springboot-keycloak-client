@@ -2,10 +2,11 @@ package org.nmb.versions.nmbkeycloak.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.nmb.versions.nmbkeycloak.dto.LoginDto;
 import org.nmb.versions.nmbkeycloak.dto.common.ApiResponse;
-import org.nmb.versions.nmbkeycloak.dto.tokens.TokenRefreshDto;
-import org.nmb.versions.nmbkeycloak.service.LoginService;
+import org.nmb.versions.nmbkeycloak.dto.otp.OtpDto;
+import org.nmb.versions.nmbkeycloak.dto.tokens.GoodAuthToken;
+
+import org.nmb.versions.nmbkeycloak.service.OtpService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,20 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/auth")
 public class OtpController {
 
-    private final LoginService loginService;
+    private final OtpService otpService;
 
     @PostMapping(value = "/request")
-    public ResponseEntity<Object> requestOtp(@RequestBody TokenRefreshDto refreshRequestDto) {
-        log.info("refreshing auth token... ");
-        ApiResponse<?> apiResponse = loginService.refreshToken(refreshRequestDto);
+    public ResponseEntity<Object> requestOtp(@RequestBody OtpDto.Inquiry otpRequest) {
+        log.info("request otp... ");
+        ApiResponse<Object> apiResponse = otpService.requestOtp(otpRequest);
         return ResponseEntity.ok().body(apiResponse);
     }
 
     @PostMapping(value = "/verify")
-    public ResponseEntity<Object> verifyOtp(@RequestBody TokenRefreshDto refreshRequestDto) {
-        log.info("refreshing auth token... ");
-        ApiResponse<?> apiResponse = loginService.refreshToken(refreshRequestDto);
+    public ResponseEntity<Object> verifyOtp(@RequestBody OtpDto.Verification verificationDto) {
+        log.info("verifying otp... ");
+        ApiResponse<GoodAuthToken> apiResponse = otpService.verifyOtp(verificationDto);
         return ResponseEntity.ok().body(apiResponse);
     }
+
 
 }

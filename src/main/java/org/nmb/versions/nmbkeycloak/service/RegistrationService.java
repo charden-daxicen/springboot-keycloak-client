@@ -1,10 +1,9 @@
 package org.nmb.versions.nmbkeycloak.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.nmb.versions.nmbkeycloak.components.TokenRetriever;
+import org.nmb.versions.nmbkeycloak.components.KeycloakAdapter;
 import org.nmb.versions.nmbkeycloak.constants.IdentifierType;
 import org.nmb.versions.nmbkeycloak.constants.RespCodes;
 import org.nmb.versions.nmbkeycloak.dto.RegistrationDto;
@@ -36,9 +35,9 @@ public class RegistrationService {
     @Value("${keycloak.user.user-lookup-url}")
     private String userLookupUrl;
 
-    private final TokenRetriever tokenRetriever;
-
     private final RestTemplate restTemplate;
+
+    private final KeycloakAdapter keycloakAdapter;
 
     public ApiResponse<?> register(RegistrationDto registrationDto) {
 
@@ -78,7 +77,7 @@ public class RegistrationService {
 
     private ApiResponse<?> registerOnKeycloak(KeycloakRegistrationDto.Request keycloakRegistrationReq) {
 
-        GoodAuthToken accessToken = tokenRetriever.getAdminAccessToken();
+        GoodAuthToken accessToken = keycloakAdapter.getAdminAccessToken();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -100,7 +99,7 @@ public class RegistrationService {
 
     private ApiResponse<GoodUser> checkUserOnKeycloak(RegistrationDto registrationDto) {
 
-        GoodAuthToken accessToken = tokenRetriever.getAdminAccessToken();
+        GoodAuthToken accessToken = authTokenRetriever.getAdminAccessToken();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

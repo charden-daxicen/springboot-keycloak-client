@@ -1,4 +1,4 @@
-package org.nmb.versions.nmbkeycloak.dto.keycloak;
+package org.nmb.versions.nmbkeycloak.dto.keycloak.otps;
 
 
 import lombok.AllArgsConstructor;
@@ -6,37 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.List;
 
-public class KeycloakRegistrationDto {
+public class KeycloakOTPDto {
 
-    public enum CredentialType {
-       password
-    }
 
     @Data
     @Builder
-    public static class Request{
-        String username;
-        boolean enabled;
-        String email;
-
-        String firstName;
-        String lastName;
-
-        List<Credentials> credentials;
-        HashMap<String,List<String>> attributes;
+    public static class InquiryRequest{
+        String identifier;
     }
-
-    @Data
-    @Builder
-    public static class Credentials{
-        CredentialType type;
-        String value;
-        boolean temporary;
-    }
-
 
 
     @NoArgsConstructor
@@ -47,6 +25,12 @@ public class KeycloakRegistrationDto {
     }
 
 
+    @Data
+    @Builder
+    public static class VerificationRequest{
+        String identifier;
+        String otp;
+    }
 
 
 }
