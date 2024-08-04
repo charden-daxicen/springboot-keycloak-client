@@ -40,12 +40,12 @@ public class RegistrationService {
 
     private final RestTemplate restTemplate;
 
-    public ApiResponse<GoodAuthToken> register(RegistrationDto registrationDto) {
+    public ApiResponse<?> register(RegistrationDto registrationDto) {
 
         /// Check user
         ApiResponse<GoodUser> goodUserApiResponse = this.checkUserOnKeycloak(registrationDto);
         if (goodUserApiResponse.getRespCode() == RespCodes.OK) {
-            String message = this.mapMessage(goodUserApiResponse.getRespBody());
+            String message = this.formatRegistrationErrorMessage(goodUserApiResponse.getRespBody());
             return ApiResponse.failure(message);
 
         } else if (goodUserApiResponse.getRespCode() != RespCodes.USER_DOES_NOT_EXIST) {
@@ -64,7 +64,7 @@ public class RegistrationService {
         attributes.put("countryCallingCode", Collections.singletonList(registrationDto.getCountryCallingCode()));
 
         KeycloakRegistrationDto.Request keycloakRegistrationReq = KeycloakRegistrationDto.Request.builder()
-                .username(registrationDto.getUsername())
+                .username(registrationDto.getEmail())
                 .email(registrationDto.getEmail())
                 .firstName(registrationDto.getFirstName())
                 .lastName(registrationDto.getLastName())
@@ -73,11 +73,10 @@ public class RegistrationService {
                 .attributes(attributes)
                 .build();
 
-        GoodAuthToken goodAuthToken = this.registerOnKeycloak(keycloakRegistrationReq);
-        return ApiResponse.success(goodAuthToken, "Authenticated");
+        return this.registerOnKeycloak(keycloakRegistrationReq);
     }
 
-    private GoodAuthToken registerOnKeycloak(KeycloakRegistrationDto.Request keycloakRegistrationReq) {
+    private ApiResponse<?> registerOnKeycloak(KeycloakRegistrationDto.Request keycloakRegistrationReq) {
 
         GoodAuthToken accessToken = tokenRetriever.getAdminAccessToken();
 
@@ -90,12 +89,13 @@ public class RegistrationService {
         HttpEntity<String> requestEntity = new HttpEntity<>(payload, headers);
         log.info("registering users {}", payload);
 
-        ResponseEntity<GoodAuthToken> response = restTemplate.postForEntity(
-                keycloakUserRegistrationUrl,
-                requestEntity,
-                GoodAuthToken.class);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(keycloakUserRegistrationUrl, requestEntity, String.class);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            log.info("registration api response {}",responseEntity.getBody());
+            return ApiResponse.success("User registered successfully");
+        }
 
-        return response.getBody();
+        return ApiResponse.failure("Failed to register user");
     }
 
     private ApiResponse<GoodUser> checkUserOnKeycloak(RegistrationDto registrationDto) {
@@ -120,7 +120,7 @@ public class RegistrationService {
         return UserLookupResponse.failure("User not found");
     }
 
-    private String mapMessage(GoodUser goodUser) {
+    private String formatRegistrationErrorMessage(GoodUser goodUser) {
         if (goodUser.getMatchedIdentifier() == IdentifierType.PHONE) {
             return String.format("Phone number %s already exists. Try logging in or resetting the password", goodUser.getPhoneNumber());
         }
